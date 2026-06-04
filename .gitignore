@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+.pnp.*
+
+# Build output
+dist/
+build/
+
+# Env — never commit real secrets. Keep .env.example tracked.
+.env
+.env.local
+.env.*.local
+.env.production
+!.env.example
+
+# Prisma local SQLite (if ever used)
+prisma/*.db
+prisma/*.db-journal
+
+# Tests / coverage
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
