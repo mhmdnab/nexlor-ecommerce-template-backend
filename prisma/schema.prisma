@@ -292,3 +292,17 @@ model StoreSetting {
   value     Json
   updatedAt DateTime @updatedAt
 }
+
+// ---------------------------------------------------------------------------
+// Variant Presets — reusable option sets (e.g. "Size", "Color") that can be
+// applied when creating new products, speeding up catalog management.
+// ---------------------------------------------------------------------------
+
+model VariantPreset {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  options   String[]
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
