@@ -140,6 +140,21 @@ async function main() {
   }
   console.log(`  • categories: ${CATEGORIES.length}`);
 
+  // ----- Variant Presets -----
+  const variantPresets = [
+    { name: 'Apparel Sizes', options: ['XS', 'S', 'M', 'L', 'XL'] },
+    { name: 'Footwear Sizes', options: ['US 7', 'US 8', 'US 9', 'US 10', 'US 11'] },
+    { name: 'Common Colors', options: ['Black', 'White', 'Navy', 'Grey'] },
+  ];
+  for (const [i, p] of variantPresets.entries()) {
+    await prisma.variantPreset.upsert({
+      where: { name: p.name },
+      update: { options: p.options, position: i },
+      create: { name: p.name, options: p.options, position: i },
+    });
+  }
+  console.log(`  • variant presets: ${variantPresets.length}`);
+
   // ----- Products -----
   const createdVariants: Array<{ variantId: string; productName: string; sku: string; name: string; price: number; imageUrl: string }> = [];
   for (const [i, p] of PRODUCTS.entries()) {
