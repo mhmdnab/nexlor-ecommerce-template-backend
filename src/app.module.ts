@@ -17,6 +17,7 @@ import { ProductsModule } from './modules/products/products.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
 import { UsersModule } from './modules/users/users.module';
+import { VariantPresetsModule } from './modules/variant-presets/variant-presets.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { UsersModule } from './modules/users/users.module';
     UsersModule,
     ProductsModule,
     CategoriesModule,
+    VariantPresetsModule,
     UploadsModule,
     CouponsModule,
     CartModule,
