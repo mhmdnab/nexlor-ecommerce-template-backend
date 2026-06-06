@@ -46,16 +46,16 @@ describe('VariantPresetsService', () => {
     expect(prisma.variantPreset.create).not.toHaveBeenCalled();
   });
 
-  it('maps a duplicate-name error (P2002) to BadRequest', async () => {
-    prisma.variantPreset.create.mockRejectedValue({ code: 'P2002' });
-    await expect(service.create({ name: 'Dup', options: ['A'] })).rejects.toBeInstanceOf(
-      BadRequestException,
-    );
-  });
-
   it('lists presets ordered by position then name', async () => {
     prisma.variantPreset.findMany.mockResolvedValue([
-      { id: 'a', name: 'A', options: ['x'], position: 0, createdAt: new Date(0), updatedAt: new Date(0) },
+      {
+        id: 'a',
+        name: 'A',
+        options: ['x'],
+        position: 0,
+        createdAt: new Date(0),
+        updatedAt: new Date(0),
+      },
     ]);
     const list = await service.list();
     expect(prisma.variantPreset.findMany).toHaveBeenCalledWith({
@@ -71,6 +71,34 @@ describe('VariantPresetsService', () => {
       NotFoundException,
     );
     expect(prisma.variantPreset.update).not.toHaveBeenCalled();
+  });
+
+  it('cleans options and trims name on update, returning the DTO', async () => {
+    prisma.variantPreset.count.mockResolvedValue(1);
+    prisma.variantPreset.update.mockImplementation(({ data }: any) => ({
+      id: 'p1',
+      name: data.name,
+      options: data.options,
+      position: data.position,
+      createdAt: new Date(0),
+      updatedAt: new Date(0),
+    }));
+    const result = await service.update('p1', {
+      name: ' Sizes ',
+      options: ['S', 's', ' M '],
+      position: 2,
+    });
+    expect(prisma.variantPreset.update).toHaveBeenCalledWith({
+      where: { id: 'p1' },
+      data: { name: 'Sizes', options: ['S', 'M'], position: 2 },
+    });
+    expect(result).toMatchObject({ id: 'p1', name: 'Sizes', options: ['S', 'M'] });
+  });
+
+  it('throws NotFound when removing a missing preset', async () => {
+    prisma.variantPreset.count.mockResolvedValue(0);
+    await expect(service.remove('nope')).rejects.toBeInstanceOf(NotFoundException);
+    expect(prisma.variantPreset.delete).not.toHaveBeenCalled();
   });
 
   it('deletes an existing preset', async () => {

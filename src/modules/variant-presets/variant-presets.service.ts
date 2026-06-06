@@ -1,3 +1,4 @@
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { ArrayMinSize, IsArray, IsInt, IsOptional, IsString, MinLength } from 'class-validator';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -12,6 +13,7 @@ export class CreateVariantPresetDto {
   @IsString({ each: true })
   options!: string[];
 
+  @ApiPropertyOptional()
   @IsOptional()
   @IsInt()
   position?: number;
@@ -68,28 +70,20 @@ export class VariantPresetsService {
 
   async create(dto: CreateVariantPresetDto): Promise<VariantPresetDto> {
     const options = this.cleanOptions(dto.options);
-    try {
-      const row = await this.prisma.variantPreset.create({
-        data: { name: dto.name.trim(), options, position: dto.position ?? 0 },
-      });
-      return this.toDto(row);
-    } catch (e) {
-      throw this.mapError(e);
-    }
+    const row = await this.prisma.variantPreset.create({
+      data: { name: dto.name.trim(), options, position: dto.position ?? 0 },
+    });
+    return this.toDto(row);
   }
 
   async update(id: string, dto: UpdateVariantPresetDto): Promise<VariantPresetDto> {
     await this.ensureExists(id);
     const options = this.cleanOptions(dto.options);
-    try {
-      const row = await this.prisma.variantPreset.update({
-        where: { id },
-        data: { name: dto.name.trim(), options, position: dto.position },
-      });
-      return this.toDto(row);
-    } catch (e) {
-      throw this.mapError(e);
-    }
+    const row = await this.prisma.variantPreset.update({
+      where: { id },
+      data: { name: dto.name.trim(), options, position: dto.position },
+    });
+    return this.toDto(row);
   }
 
   async remove(id: string) {
@@ -112,12 +106,5 @@ export class VariantPresetsService {
   private async ensureExists(id: string) {
     const exists = await this.prisma.variantPreset.count({ where: { id } });
     if (!exists) throw new NotFoundException('Variant preset not found.');
-  }
-
-  private mapError(e: unknown): Error {
-    if (typeof e === 'object' && e !== null && 'code' in e && (e as { code?: string }).code === 'P2002') {
-      return new BadRequestException('A preset with that name already exists.');
-    }
-    return e as Error;
   }
 }
