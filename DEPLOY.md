@@ -32,7 +32,7 @@ Build / start are defined in the Blueprint:
 
 | Step  | Command |
 | ----- | ------- |
-| Build | `npm ci && npx prisma generate && npm run build` |
+| Build | `npm ci --include=dev && npx prisma generate && npm run build` (devDeps are needed to build) |
 | Start | `npm run start:render` → `prisma migrate deploy && node dist/main.js` |
 | Health| `GET /api/health` |
 

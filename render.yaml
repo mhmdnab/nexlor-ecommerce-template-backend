@@ -17,8 +17,11 @@ services:
     runtime: node
     plan: free
     region: frankfurt # pick the region closest to you / your DB
-    # Install, generate the Prisma client, and compile to dist/.
-    buildCommand: npm ci && npx prisma generate && npm run build
+    # Install (incl. devDependencies), generate the Prisma client, compile to dist/.
+    # --include=dev is required: NODE_ENV=production (set below) otherwise makes
+    # `npm ci` skip devDependencies, but the build needs nest-cli/prisma/typescript,
+    # and the start command needs the `prisma` CLI for `migrate deploy`.
+    buildCommand: npm ci --include=dev && npx prisma generate && npm run build
     # Apply pending migrations, then boot. Runs on every deploy/cold start;
     # `migrate deploy` is a no-op when the DB is already up to date.
     startCommand: npm run start:render
